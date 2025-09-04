@@ -1,9 +1,16 @@
 import 'dart:convert';
 
-import 'package:base_clean_arch_bloc/src/core/cache/cache.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../cache.dart';
+import '../../services/logger_service.dart';
+
 class SharedPreferencesImpl implements ICache {
+  final LoggerService? _loggerService;
+
+  SharedPreferencesImpl({LoggerService? loggerService})
+      : _loggerService = loggerService;
+
   @override
   Future<dynamic> getData(String key) async {
     final prefs = await SharedPreferences.getInstance();
@@ -12,6 +19,9 @@ class SharedPreferencesImpl implements ICache {
     try {
       return jsonDecode(result as String);
     } catch (e) {
+      _loggerService?.debug(
+          'Failed to decode JSON from cache, returning raw value',
+          data: {'key': key, 'error': e.toString()});
       return result;
     }
   }
