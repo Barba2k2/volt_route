@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'src/core/di/dependency_injector.dart';
+import 'src/core/DI/dependency_injector.dart';
 import 'src/presentation/app_widget.dart';
 
 void main() async {
