@@ -1,12 +1,17 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+
+import 'package:logger/logger.dart';
 
 import '../client_http.dart';
 
 const JsonEncoder _encoder = JsonEncoder.withIndent('  ');
 
 class ClientInterceptorLoggerImpl implements IClientInterceptor {
+  final Logger _logger;
+
+  ClientInterceptorLoggerImpl({Logger? logger}) : _logger = logger ?? Logger();
+
   @override
   FutureOr<RestClientHttpMessage> onError(RestClientException err) {
     final loggerString = <String>[
@@ -28,13 +33,13 @@ class ClientInterceptorLoggerImpl implements IClientInterceptor {
       '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
     ].join('\n');
 
-    log(loggerString);
+    _logger.e(loggerString);
     return err;
   }
 
   @override
   FutureOr<RestClientHttpMessage> onRequest(RestClientRequest request) {
-    final loggerString = [
+    final loggerString = <String>[
       '\n📤 [REQUEST]',
       '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
       '🔹 ${request.method.toUpperCase()} ${_formatUrl(request)}',
@@ -46,13 +51,13 @@ class ClientInterceptorLoggerImpl implements IClientInterceptor {
       '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
     ].join('\n');
 
-    log(loggerString);
+    _logger.d(loggerString);
     return request;
   }
 
   @override
   FutureOr<RestClientHttpMessage> onResponse(RestClientResponse response) {
-    final loggerString = [
+    final loggerString = <String>[
       '\n📥 [RESPONSE] Status ${response.statusCode}',
       '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
       '🔹 ${response.request.method.toUpperCase()} ${_formatUrl(response.request)}',
@@ -61,7 +66,7 @@ class ClientInterceptorLoggerImpl implements IClientInterceptor {
       '━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━',
     ].join('\n');
 
-    log(loggerString);
+    _logger.i(loggerString);
     return response;
   }
 
