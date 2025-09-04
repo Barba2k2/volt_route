@@ -1,8 +1,10 @@
-import 'package:base_clean_arch_bloc/src/core/errors/errors.dart';
+import 'base_exception.dart';
 
 class NotFoundException extends BaseException {
+  final int statusCode;
+
   NotFoundException({
     required super.message,
-    super.statusCode = 404,
+    this.statusCode = 404,
   });
 }
