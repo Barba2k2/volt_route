@@ -1,13 +1,15 @@
-abstract class BaseException implements Exception {
+/// Base exception class for all custom exceptions
+class BaseException implements Exception {
+  final String message;
+  final String? code;
+  final dynamic data;
+
   const BaseException({
     required this.message,
+    this.code,
     this.data,
-    this.statusCode,
-    this.stackTracing,
   });
 
-  final dynamic data;
-  final String message;
-  final int? statusCode;
-  final dynamic stackTracing;
+  @override
+  String toString() => 'BaseException: $message';
 }
