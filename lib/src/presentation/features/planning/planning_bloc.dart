@@ -21,6 +21,7 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
     on<VehicleSelected>(_onVehicleSelected);
     on<AssumptionsEdited>(_onAssumptionsEdited);
     on<TripNameChanged>(_onTripNameChanged);
+    on<CurrentLocationObtained>(_onCurrentLocationObtained);
     on<PlanRequested>(_onPlanRequested);
     on<ReplanRequested>(_onReplanRequested);
   }
@@ -172,6 +173,23 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
           tripName: event.tripName,
           trip: (state as PlanningReady).trip,
           notices: (state as PlanningReady).notices,
+        ),
+      );
+    }
+  }
+
+  void _onCurrentLocationObtained(
+      CurrentLocationObtained event, Emitter<PlanningState> emit) {
+    if (state is PlanningInitial) {
+      emit(
+        PlanningInitial(
+          originLat: event.latitude,
+          originLng: event.longitude,
+          destinationLat: (state as PlanningInitial).destinationLat,
+          destinationLng: (state as PlanningInitial).destinationLng,
+          vehicle: (state as PlanningInitial).vehicle,
+          assumptions: (state as PlanningInitial).assumptions,
+          tripName: (state as PlanningInitial).tripName,
         ),
       );
     }
