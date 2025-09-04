@@ -1,5 +1,7 @@
-import 'package:base_clean_arch_bloc/src/core/client_http/client_http.dart';
-import 'package:base_clean_arch_bloc/src/core/client_http/rest_client_multipart.dart';
+import 'rest_client_request.dart';
+import 'rest_client_response.dart';
+import 'rest_client_multipart.dart';
+import 'client_interceptor_interface.dart';
 
 abstract interface class IRestClient {
   Future<RestClientResponse> post(RestClientRequest request);
