@@ -1,8 +1,9 @@
-import 'package:base_clean_arch_bloc/routes.dart';
-import 'package:base_clean_arch_bloc/src/app/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:base_clean_arch_bloc/src/core/DI/dependency_injector.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import 'routes.dart';
+import 'src/core/DI/dependency_injector.dart';
+import 'src/presentation/features/auth/auth_bloc.dart';
 
 class AppWidget extends StatelessWidget {
   const AppWidget({super.key});
@@ -12,7 +13,7 @@ class AppWidget extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (context) => injector<AuthBloc>(),
+          create: (context) => getIt<AuthBloc>(),
         ),
       ],
       child: MaterialApp.router(
