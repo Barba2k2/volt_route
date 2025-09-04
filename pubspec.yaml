@@ -33,6 +33,7 @@ dependencies:
   # Google Services
   google_maps_flutter: ^2.9.0
   google_places_flutter: ^2.0.9
+  geolocator: ^11.0.0
   
   # Utilities
   intl: ^0.20.2
