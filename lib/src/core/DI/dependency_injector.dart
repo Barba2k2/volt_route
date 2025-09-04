@@ -1,47 +1,170 @@
-import 'package:base_clean_arch_bloc/src/app/features/auth/data/datasources/auth_remote_datasource.dart';
-import 'package:base_clean_arch_bloc/src/app/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:base_clean_arch_bloc/src/app/features/auth/domain/repositories/auth_repository_interface.dart';
-import 'package:base_clean_arch_bloc/src/app/features/auth/domain/usecases/login_usecase.dart';
-import 'package:base_clean_arch_bloc/src/app/features/auth/infrastructure/auth_interceptor.dart';
-import 'package:base_clean_arch_bloc/src/app/features/auth/presentation/bloc/auth_bloc.dart';
-import 'package:base_clean_arch_bloc/src/core/cache/shared_preferences/shared_preferences_impl.dart';
-import 'package:base_clean_arch_bloc/src/core/client_http/dio/rest_client_dio_impl.dart';
-import 'package:base_clean_arch_bloc/src/core/client_http/logger/client_interceptor_logger_impl.dart';
-import 'package:base_clean_arch_bloc/src/core/services/session_service.dart';
+import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
+import 'package:injectable/injectable.dart';
+import 'package:isar/isar.dart';
+import 'package:logger/logger.dart';
 
-final injector = GetIt.instance;
+import '../../data/datasources/local/isar_datasource.dart';
+import '../../data/datasources/remote/google_directions_client.dart';
+import '../../data/datasources/remote/google_places_client.dart';
+import '../../data/models/leg_estimate_dto.dart';
+import '../../data/models/trip_dto.dart';
+import '../../data/models/user_dto.dart';
+import '../../data/models/vehicle_dto.dart';
+import '../../data/repositories_impl/auth_repository_impl.dart';
+import '../../data/repositories_impl/charging_repository_impl.dart';
+import '../../data/repositories_impl/routing_repository_impl.dart';
+import '../../data/repositories_impl/trips_repository_impl.dart';
+import '../../domain/repositories/auth_repository.dart';
+import '../../domain/repositories/charging_repository.dart';
+import '../../domain/repositories/routing_repository.dart';
+import '../../domain/repositories/trips_repository.dart';
+import '../../domain/usecases/authenticate_user.dart';
+import '../../domain/usecases/estimate_leg_energy.dart';
+import '../../domain/usecases/get_compatible_chargers.dart';
+import '../../domain/usecases/get_saved_trips.dart';
+import '../../domain/usecases/plan_route.dart';
+import '../../domain/usecases/save_trip.dart';
+import '../services/logger_service.dart';
 
-void setupDependencyInjector({bool loggerApi = false}) {
-  injector.registerFactory<RestClientDioImpl>(() {
-    final instance = RestClientDioImpl(
-      dio: DioFactory.dio(),
-    );
+final GetIt getIt = GetIt.instance;
 
-    instance.addInterceptors(AuthInterceptor(
-      sessionService: injector<SessionService>(),
-    ));
+@InjectableInit()
+Future<void> configureDependencies() async {
+  // Initialize Isar database
+  final isar = await Isar.open([
+    VehicleDtoSchema,
+    TripDtoSchema,
+    UserDtoSchema,
+    LegEstimateDtoSchema,
+  ], directory: '');
 
-    if (loggerApi) {
-      instance.addInterceptors(ClientInterceptorLoggerImpl());
-    }
+  // Register core dependencies
+  getIt.registerSingleton<Isar>(isar);
+  getIt.registerSingleton<Logger>(Logger());
+  getIt.registerSingleton<LoggerService>(LoggerService());
 
-    return instance;
-  });
+  // Register Dio with interceptors
+  getIt.registerSingleton<Dio>(_createDio());
 
-  injector.registerLazySingleton<SessionService>(() {
-    return SessionService(
-      sharedPreferencesImpl: SharedPreferencesImpl(),
-    );
-  });
+  // Register data sources
+  getIt.registerLazySingleton<IsarDataSource>(
+    () => IsarDataSource(isar: getIt<Isar>()),
+  );
 
-  injector.registerLazySingleton<AuthRemoteDatasource>(() {
-    return AuthRemoteDatasource(
-      restClient: injector<RestClientDioImpl>(),
-    );
-  });
+  getIt.registerLazySingleton<GooglePlacesClient>(
+    () => GooglePlacesClient(
+      dio: getIt<Dio>(),
+      apiKey: _getGooglePlacesApiKey(),
+      loggerService: getIt<LoggerService>(),
+    ),
+  );
 
-  injector.registerLazySingleton<IAuthRepository>(() => AuthRepositoryImpl(authRemoteDatasource: injector<AuthRemoteDatasource>()));
+  getIt.registerLazySingleton<GoogleDirectionsClient>(
+    () => GoogleDirectionsClient(
+      dio: getIt<Dio>(),
+      apiKey: _getGoogleDirectionsApiKey(),
+      loggerService: getIt<LoggerService>(),
+    ),
+  );
 
-  injector.registerLazySingleton(() => AuthBloc(loginUsecase: LoginUsecase(authRepository: injector<IAuthRepository>())));
+  // Register repositories
+  getIt.registerLazySingleton<RoutingRepository>(
+    () => RoutingRepositoryImpl(
+      directionsClient: getIt<GoogleDirectionsClient>(),
+      loggerService: getIt<LoggerService>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<ChargingRepository>(
+    () => ChargingRepositoryImpl(
+      placesClient: getIt<GooglePlacesClient>(),
+      loggerService: getIt<LoggerService>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<TripsRepository>(
+    () => TripsRepositoryImpl(
+      localDataSource: getIt<IsarDataSource>(),
+      loggerService: getIt<LoggerService>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(
+      localDataSource: getIt<IsarDataSource>(),
+      loggerService: getIt<LoggerService>(),
+    ),
+  );
+
+  // Register use cases
+  getIt.registerLazySingleton<PlanRoute>(
+    () => PlanRoute(
+      routingRepository: getIt<RoutingRepository>(),
+      chargingRepository: getIt<ChargingRepository>(),
+      loggerService: getIt<LoggerService>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<EstimateLegEnergy>(() => EstimateLegEnergy());
+
+  getIt.registerLazySingleton<GetCompatibleChargers>(
+    () => GetCompatibleChargers(
+      chargingRepository: getIt<ChargingRepository>(),
+      loggerService: getIt<LoggerService>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<SaveTrip>(
+    () => SaveTrip(
+      tripsRepository: getIt<TripsRepository>(),
+      loggerService: getIt<LoggerService>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<GetSavedTrips>(
+    () => GetSavedTrips(
+      tripsRepository: getIt<TripsRepository>(),
+      loggerService: getIt<LoggerService>(),
+    ),
+  );
+
+  getIt.registerLazySingleton<AuthenticateUser>(
+    () => AuthenticateUser(
+      authRepository: getIt<AuthRepository>(),
+      loggerService: getIt<LoggerService>(),
+    ),
+  );
+}
+
+/// Creates and configures Dio instance
+Dio _createDio() {
+  final dio = Dio();
+
+  // Add interceptors
+  dio.interceptors.add(
+    LogInterceptor(
+      requestBody: true,
+      responseBody: true,
+      logPrint: (object) => getIt<Logger>().d(object),
+    ),
+  );
+
+  // Add timeout
+  dio.options.connectTimeout = const Duration(seconds: 30);
+  dio.options.receiveTimeout = const Duration(seconds: 30);
+
+  return dio;
+}
+
+/// Gets Google Places API key - Direct configuration
+String _getGooglePlacesApiKey() {
+  // Using the same API key for all Google services
+  return 'AIzaSyAwNAjDMvWL7po2DuM10tt_RxSRjJ2QdxM';
+}
+
+/// Gets Google Directions API key - Direct configuration
+String _getGoogleDirectionsApiKey() {
+  // Using the same API key for all Google services
+  return 'AIzaSyAwNAjDMvWL7po2DuM10tt_RxSRjJ2QdxM';
 }
