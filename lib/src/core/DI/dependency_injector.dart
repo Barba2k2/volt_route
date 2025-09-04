@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:isar/isar.dart';
 import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../../data/datasources/local/isar_datasource.dart';
 import '../../data/datasources/remote/google_directions_client.dart';
@@ -31,13 +32,19 @@ final GetIt getIt = GetIt.instance;
 
 @InjectableInit()
 Future<void> configureDependencies() async {
+  // Get application documents directory for Isar database
+  final dir = await getApplicationDocumentsDirectory();
+
   // Initialize Isar database
-  final isar = await Isar.open([
-    VehicleDtoSchema,
-    TripDtoSchema,
-    UserDtoSchema,
-    LegEstimateDtoSchema,
-  ], directory: '');
+  final isar = await Isar.open(
+    [
+      VehicleDtoSchema,
+      TripDtoSchema,
+      UserDtoSchema,
+      LegEstimateDtoSchema,
+    ],
+    directory: dir.path,
+  );
 
   // Register core dependencies
   getIt.registerSingleton<Isar>(isar);
