@@ -1,6 +1,9 @@
 import 'dart:async';
 
-import 'package:base_clean_arch_bloc/src/core/client_http/client_http.dart';
+import 'rest_client_request.dart';
+import 'rest_client_response.dart';
+import 'rest_client_exception.dart';
+import 'rest_client_http_message.dart';
 
 abstract interface class IClientInterceptor {
   FutureOr<RestClientHttpMessage> onResponse(RestClientResponse response);
