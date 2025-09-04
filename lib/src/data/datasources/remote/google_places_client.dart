@@ -100,6 +100,53 @@ class GooglePlacesClient {
     }
   }
 
+  /// Geocodes an address to get its coordinates
+  Future<LatLng?> geocodeAddress(String address) async {
+    try {
+      final response = await _dio.get(
+        'https://maps.googleapis.com/maps/api/geocode/json',
+        queryParameters: {
+          'address': address,
+          'key': _apiKey,
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to geocode address: ${response.statusCode}');
+      }
+
+      final data = response.data as Map<String, dynamic>;
+      final results = data['results'] as List<dynamic>;
+
+      if (results.isEmpty) {
+        return null;
+      }
+
+      final result = results.first as Map<String, dynamic>;
+      final geometry = result['geometry'] as Map<String, dynamic>;
+      final location = geometry['location'] as Map<String, dynamic>;
+
+      return LatLng(
+        latitude: location['lat'] as double,
+        longitude: location['lng'] as double,
+      );
+    } catch (e) {
+      final exception = Exception('Failed to geocode address: ${e.toString()}');
+
+      _loggerService.logHttpException(
+        exception,
+        method: 'GET',
+        url: 'Google Geocoding API',
+        requestData: {
+          'address': address,
+        },
+        stackTrace: StackTrace.current,
+      );
+
+      throw exception;
+    }
+  }
+
   /// Gets detailed information about a specific charger
   Future<ChargerDto> getChargerDetails({
     required String placeId,
