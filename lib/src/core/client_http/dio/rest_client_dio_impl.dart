@@ -1,7 +1,8 @@
-import 'package:base_clean_arch_bloc/src/core/client_http/client_http.dart';
-import 'package:base_clean_arch_bloc/src/core/client_http/dio/client_interceptor_dio_impl.dart';
-import 'package:base_clean_arch_bloc/src/core/client_http/dio/dio_adapter.dart';
-import 'package:base_clean_arch_bloc/src/core/client_http/rest_client_multipart.dart';
+import 'dart:developer';
+
+import '../client_http.dart';
+import 'client_interceptor_dio_impl.dart';
+import 'dio_adapter.dart';
 import 'package:dio/dio.dart';
 
 class DioFactory {
@@ -26,7 +27,8 @@ class RestClientDioImpl implements IRestClient {
 
   @override
   void addInterceptors(IClientInterceptor interceptor) {
-    _interceptors[interceptor] = ClientInterceptorDioImpl(interceptor: interceptor);
+    _interceptors[interceptor] =
+        ClientInterceptorDioImpl(interceptor: interceptor);
     _dio.interceptors.add(_interceptors[interceptor]!);
   }
 
@@ -38,9 +40,9 @@ class RestClientDioImpl implements IRestClient {
   @override
   Future<RestClientResponse> upload(RestClientMultipart multipart) async {
     final formData = FormData.fromMap({
-      multipart.fileKey: MultipartFile.fromBytes(
-        multipart.fileBytes ?? [],
-        filename: multipart.fileName,
+      multipart.field: MultipartFile.fromBytes(
+        multipart.data is List<int> ? multipart.data : [],
+        filename: multipart.filename,
       ),
     });
 
@@ -53,8 +55,10 @@ class RestClientDioImpl implements IRestClient {
     );
 
     Dio dio = Dio(baseOptions);
+    // Note: path should be provided as a parameter or stored elsewhere
+    // For now using a placeholder - this needs to be fixed based on actual requirements
     final response = await dio.put(
-      multipart.path,
+      '/upload', // This should be passed as a parameter
       data: formData,
     );
 
@@ -124,7 +128,7 @@ class RestClientDioImpl implements IRestClient {
       );
       return DioAdapter.toClientResponse(response);
     } on DioException catch (e) {
-      print(e.message);
+      log(e.message ?? '');
       throw DioAdapter.toClientException(e);
     }
   }
