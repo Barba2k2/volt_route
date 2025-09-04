@@ -1,6 +1,7 @@
-import 'package:base_clean_arch_bloc/src/app/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
+import 'src/presentation/features/auth/views/auth_page.dart';
 
 final router = GoRouter(
   initialLocation: '/login',
@@ -10,6 +11,9 @@ final router = GoRouter(
       path: '/',
       builder: (context, state) => const Placeholder(),
     ),
-    GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const AuthPage(),
+    ),
   ],
 );
