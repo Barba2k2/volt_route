@@ -27,6 +27,7 @@ import '../../domain/usecases/get_saved_trips.dart';
 import '../../domain/usecases/plan_route.dart';
 import '../../domain/usecases/save_trip.dart';
 import '../services/logger_service.dart';
+import '../services/location_service.dart';
 
 final GetIt getIt = GetIt.instance;
 
@@ -50,6 +51,7 @@ Future<void> configureDependencies() async {
   getIt.registerSingleton<Isar>(isar);
   getIt.registerSingleton<Logger>(Logger());
   getIt.registerSingleton<LoggerService>(LoggerService());
+  getIt.registerLazySingleton<LocationService>(() => LocationService());
 
   // Register Dio with interceptors
   getIt.registerSingleton<Dio>(_createDio());
