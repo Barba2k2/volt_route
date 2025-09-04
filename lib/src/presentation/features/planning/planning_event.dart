@@ -60,6 +60,18 @@ class AssumptionsEdited extends PlanningEvent {
   List<Object?> get props => [assumptions];
 }
 
+/// Event when trip name is changed
+class TripNameChanged extends PlanningEvent {
+  final String tripName;
+
+  const TripNameChanged({
+    required this.tripName,
+  });
+
+  @override
+  List<Object?> get props => [tripName];
+}
+
 /// Event when trip planning is requested
 class PlanRequested extends PlanningEvent {
   final String? userId;
