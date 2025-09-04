@@ -78,7 +78,7 @@ class ChargerDto {
 
   factory ChargerDto.fromJson(Map<String, dynamic> json) {
     return ChargerDto(
-      id: json['id'] as String,
+      id: json['place_id'] as String,
       name: json['name'] as String,
       placeId: json['place_id'] as String,
       latitude: (json['geometry']['location']['lat'] as num).toDouble(),
