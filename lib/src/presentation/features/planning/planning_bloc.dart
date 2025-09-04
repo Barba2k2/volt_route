@@ -20,113 +20,160 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
     on<DestinationChanged>(_onDestinationChanged);
     on<VehicleSelected>(_onVehicleSelected);
     on<AssumptionsEdited>(_onAssumptionsEdited);
+    on<TripNameChanged>(_onTripNameChanged);
     on<PlanRequested>(_onPlanRequested);
     on<ReplanRequested>(_onReplanRequested);
   }
 
   void _onOriginChanged(OriginChanged event, Emitter<PlanningState> emit) {
     if (state is PlanningInitial) {
-      emit(PlanningInitial(
-        originLat: event.latitude,
-        originLng: event.longitude,
-        destinationLat: (state as PlanningInitial).destinationLat,
-        destinationLng: (state as PlanningInitial).destinationLng,
-        vehicle: (state as PlanningInitial).vehicle,
-        assumptions: (state as PlanningInitial).assumptions,
-        tripName: (state as PlanningInitial).tripName,
-      ));
+      emit(
+        PlanningInitial(
+          originLat: event.latitude,
+          originLng: event.longitude,
+          destinationLat: (state as PlanningInitial).destinationLat,
+          destinationLng: (state as PlanningInitial).destinationLng,
+          vehicle: (state as PlanningInitial).vehicle,
+          assumptions: (state as PlanningInitial).assumptions,
+          tripName: (state as PlanningInitial).tripName,
+        ),
+      );
     } else if (state is PlanningReady) {
-      emit(PlanningReady(
-        originLat: event.latitude,
-        originLng: event.longitude,
-        destinationLat: (state as PlanningReady).destinationLat,
-        destinationLng: (state as PlanningReady).destinationLng,
-        vehicle: (state as PlanningReady).vehicle,
-        assumptions: (state as PlanningReady).assumptions,
-        tripName: (state as PlanningReady).tripName,
-        trip: (state as PlanningReady).trip,
-        notices: (state as PlanningReady).notices,
-      ));
+      emit(
+        PlanningReady(
+          originLat: event.latitude,
+          originLng: event.longitude,
+          destinationLat: (state as PlanningReady).destinationLat,
+          destinationLng: (state as PlanningReady).destinationLng,
+          vehicle: (state as PlanningReady).vehicle,
+          assumptions: (state as PlanningReady).assumptions,
+          tripName: (state as PlanningReady).tripName,
+          trip: (state as PlanningReady).trip,
+          notices: (state as PlanningReady).notices,
+        ),
+      );
     }
   }
 
   void _onDestinationChanged(
       DestinationChanged event, Emitter<PlanningState> emit) {
     if (state is PlanningInitial) {
-      emit(PlanningInitial(
-        originLat: (state as PlanningInitial).originLat,
-        originLng: (state as PlanningInitial).originLng,
-        destinationLat: event.latitude,
-        destinationLng: event.longitude,
-        vehicle: (state as PlanningInitial).vehicle,
-        assumptions: (state as PlanningInitial).assumptions,
-        tripName: (state as PlanningInitial).tripName,
-      ));
+      emit(
+        PlanningInitial(
+          originLat: (state as PlanningInitial).originLat,
+          originLng: (state as PlanningInitial).originLng,
+          destinationLat: event.latitude,
+          destinationLng: event.longitude,
+          vehicle: (state as PlanningInitial).vehicle,
+          assumptions: (state as PlanningInitial).assumptions,
+          tripName: (state as PlanningInitial).tripName,
+        ),
+      );
     } else if (state is PlanningReady) {
-      emit(PlanningReady(
-        originLat: (state as PlanningReady).originLat,
-        originLng: (state as PlanningReady).originLng,
-        destinationLat: event.latitude,
-        destinationLng: event.longitude,
-        vehicle: (state as PlanningReady).vehicle,
-        assumptions: (state as PlanningReady).assumptions,
-        tripName: (state as PlanningReady).tripName,
-        trip: (state as PlanningReady).trip,
-        notices: (state as PlanningReady).notices,
-      ));
+      emit(
+        PlanningReady(
+          originLat: (state as PlanningReady).originLat,
+          originLng: (state as PlanningReady).originLng,
+          destinationLat: event.latitude,
+          destinationLng: event.longitude,
+          vehicle: (state as PlanningReady).vehicle,
+          assumptions: (state as PlanningReady).assumptions,
+          tripName: (state as PlanningReady).tripName,
+          trip: (state as PlanningReady).trip,
+          notices: (state as PlanningReady).notices,
+        ),
+      );
     }
   }
 
   void _onVehicleSelected(VehicleSelected event, Emitter<PlanningState> emit) {
     if (state is PlanningInitial) {
-      emit(PlanningInitial(
-        originLat: (state as PlanningInitial).originLat,
-        originLng: (state as PlanningInitial).originLng,
-        destinationLat: (state as PlanningInitial).destinationLat,
-        destinationLng: (state as PlanningInitial).destinationLng,
-        vehicle: event.vehicle,
-        assumptions: (state as PlanningInitial).assumptions,
-        tripName: (state as PlanningInitial).tripName,
-      ));
+      emit(
+        PlanningInitial(
+          originLat: (state as PlanningInitial).originLat,
+          originLng: (state as PlanningInitial).originLng,
+          destinationLat: (state as PlanningInitial).destinationLat,
+          destinationLng: (state as PlanningInitial).destinationLng,
+          vehicle: event.vehicle,
+          assumptions: (state as PlanningInitial).assumptions,
+          tripName: (state as PlanningInitial).tripName,
+        ),
+      );
     } else if (state is PlanningReady) {
-      emit(PlanningReady(
-        originLat: (state as PlanningReady).originLat,
-        originLng: (state as PlanningReady).originLng,
-        destinationLat: (state as PlanningReady).destinationLat,
-        destinationLng: (state as PlanningReady).destinationLng,
-        vehicle: event.vehicle,
-        assumptions: (state as PlanningReady).assumptions,
-        tripName: (state as PlanningReady).tripName,
-        trip: (state as PlanningReady).trip,
-        notices: (state as PlanningReady).notices,
-      ));
+      emit(
+        PlanningReady(
+          originLat: (state as PlanningReady).originLat,
+          originLng: (state as PlanningReady).originLng,
+          destinationLat: (state as PlanningReady).destinationLat,
+          destinationLng: (state as PlanningReady).destinationLng,
+          vehicle: event.vehicle,
+          assumptions: (state as PlanningReady).assumptions,
+          tripName: (state as PlanningReady).tripName,
+          trip: (state as PlanningReady).trip,
+          notices: (state as PlanningReady).notices,
+        ),
+      );
     }
   }
 
   void _onAssumptionsEdited(
       AssumptionsEdited event, Emitter<PlanningState> emit) {
     if (state is PlanningInitial) {
-      emit(PlanningInitial(
-        originLat: (state as PlanningInitial).originLat,
-        originLng: (state as PlanningInitial).originLng,
-        destinationLat: (state as PlanningInitial).destinationLat,
-        destinationLng: (state as PlanningInitial).destinationLng,
-        vehicle: (state as PlanningInitial).vehicle,
-        assumptions: event.assumptions,
-        tripName: (state as PlanningInitial).tripName,
-      ));
+      emit(
+        PlanningInitial(
+          originLat: (state as PlanningInitial).originLat,
+          originLng: (state as PlanningInitial).originLng,
+          destinationLat: (state as PlanningInitial).destinationLat,
+          destinationLng: (state as PlanningInitial).destinationLng,
+          vehicle: (state as PlanningInitial).vehicle,
+          assumptions: event.assumptions,
+          tripName: (state as PlanningInitial).tripName,
+        ),
+      );
     } else if (state is PlanningReady) {
-      emit(PlanningReady(
-        originLat: (state as PlanningReady).originLat,
-        originLng: (state as PlanningReady).originLng,
-        destinationLat: (state as PlanningReady).destinationLat,
-        destinationLng: (state as PlanningReady).destinationLng,
-        vehicle: (state as PlanningReady).vehicle,
-        assumptions: event.assumptions,
-        tripName: (state as PlanningReady).tripName,
-        trip: (state as PlanningReady).trip,
-        notices: (state as PlanningReady).notices,
-      ));
+      emit(
+        PlanningReady(
+          originLat: (state as PlanningReady).originLat,
+          originLng: (state as PlanningReady).originLng,
+          destinationLat: (state as PlanningReady).destinationLat,
+          destinationLng: (state as PlanningReady).destinationLng,
+          vehicle: (state as PlanningReady).vehicle,
+          assumptions: event.assumptions,
+          tripName: (state as PlanningReady).tripName,
+          trip: (state as PlanningReady).trip,
+          notices: (state as PlanningReady).notices,
+        ),
+      );
+    }
+  }
+
+  void _onTripNameChanged(TripNameChanged event, Emitter<PlanningState> emit) {
+    if (state is PlanningInitial) {
+      emit(
+        PlanningInitial(
+          originLat: (state as PlanningInitial).originLat,
+          originLng: (state as PlanningInitial).originLng,
+          destinationLat: (state as PlanningInitial).destinationLat,
+          destinationLng: (state as PlanningInitial).destinationLng,
+          vehicle: (state as PlanningInitial).vehicle,
+          assumptions: (state as PlanningInitial).assumptions,
+          tripName: event.tripName,
+        ),
+      );
+    } else if (state is PlanningReady) {
+      emit(
+        PlanningReady(
+          originLat: (state as PlanningReady).originLat,
+          originLng: (state as PlanningReady).originLng,
+          destinationLat: (state as PlanningReady).destinationLat,
+          destinationLng: (state as PlanningReady).destinationLng,
+          vehicle: (state as PlanningReady).vehicle,
+          assumptions: (state as PlanningReady).assumptions,
+          tripName: event.tripName,
+          trip: (state as PlanningReady).trip,
+          notices: (state as PlanningReady).notices,
+        ),
+      );
     }
   }
 
@@ -142,22 +189,14 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
         currentState.destinationLat == null ||
         currentState.destinationLng == null ||
         currentState.vehicle == null) {
-      emit(PlanningError('Please fill in all required fields'));
+      emit(
+        const PlanningError('Please fill in all required fields'),
+      );
       return;
     }
 
-    emit(PlanningLoading(
-      originLat: currentState.originLat!,
-      originLng: currentState.originLng!,
-      destinationLat: currentState.destinationLat!,
-      destinationLng: currentState.destinationLng!,
-      vehicle: currentState.vehicle!,
-      assumptions: currentState.assumptions,
-      tripName: currentState.tripName,
-    ));
-
-    try {
-      final result = await _planRoute(PlanRouteParams(
+    emit(
+      PlanningLoading(
         originLat: currentState.originLat!,
         originLng: currentState.originLng!,
         destinationLat: currentState.destinationLat!,
@@ -165,31 +204,51 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
         vehicle: currentState.vehicle!,
         assumptions: currentState.assumptions,
         tripName: currentState.tripName,
-        userId: event.userId,
-      ));
+      ),
+    );
+
+    try {
+      final result = await _planRoute(
+        PlanRouteParams(
+          originLat: currentState.originLat!,
+          originLng: currentState.originLng!,
+          destinationLat: currentState.destinationLat!,
+          destinationLng: currentState.destinationLng!,
+          vehicle: currentState.vehicle!,
+          assumptions: currentState.assumptions,
+          tripName: currentState.tripName,
+          userId: event.userId,
+        ),
+      );
 
       if (result.isError()) {
-        emit(PlanningError(
-            result.exceptionOrNull()?.toString() ?? 'Unknown error'));
+        emit(
+          PlanningError(
+              result.exceptionOrNull()?.toString() ?? 'Unknown error'),
+        );
         return;
       }
 
       final trip = result.getOrThrow();
       final notices = _generateNotices(trip);
 
-      emit(PlanningReady(
-        originLat: currentState.originLat!,
-        originLng: currentState.originLng!,
-        destinationLat: currentState.destinationLat!,
-        destinationLng: currentState.destinationLng!,
-        vehicle: currentState.vehicle!,
-        assumptions: currentState.assumptions,
-        tripName: currentState.tripName,
-        trip: trip,
-        notices: notices,
-      ));
+      emit(
+        PlanningReady(
+          originLat: currentState.originLat!,
+          originLng: currentState.originLng!,
+          destinationLat: currentState.destinationLat!,
+          destinationLng: currentState.destinationLng!,
+          vehicle: currentState.vehicle!,
+          assumptions: currentState.assumptions,
+          tripName: currentState.tripName,
+          trip: trip,
+          notices: notices,
+        ),
+      );
     } catch (e) {
-      emit(PlanningError('An unexpected error occurred: ${e.toString()}'));
+      emit(
+        PlanningError('An unexpected error occurred: ${e.toString()}'),
+      );
     }
   }
 
@@ -199,18 +258,8 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
 
     final currentState = state as PlanningReady;
 
-    emit(PlanningLoading(
-      originLat: currentState.originLat,
-      originLng: currentState.originLng,
-      destinationLat: currentState.destinationLat,
-      destinationLng: currentState.destinationLng,
-      vehicle: currentState.vehicle,
-      assumptions: currentState.assumptions,
-      tripName: currentState.tripName,
-    ));
-
-    try {
-      final result = await _planRoute(PlanRouteParams(
+    emit(
+      PlanningLoading(
         originLat: currentState.originLat,
         originLng: currentState.originLng,
         destinationLat: currentState.destinationLat,
@@ -218,31 +267,51 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
         vehicle: currentState.vehicle,
         assumptions: currentState.assumptions,
         tripName: currentState.tripName,
-        userId: event.userId,
-      ));
+      ),
+    );
+
+    try {
+      final result = await _planRoute(
+        PlanRouteParams(
+          originLat: currentState.originLat,
+          originLng: currentState.originLng,
+          destinationLat: currentState.destinationLat,
+          destinationLng: currentState.destinationLng,
+          vehicle: currentState.vehicle,
+          assumptions: currentState.assumptions,
+          tripName: currentState.tripName,
+          userId: event.userId,
+        ),
+      );
 
       if (result.isError()) {
-        emit(PlanningError(
-            result.exceptionOrNull()?.toString() ?? 'Unknown error'));
+        emit(
+          PlanningError(
+              result.exceptionOrNull()?.toString() ?? 'Unknown error'),
+        );
         return;
       }
 
       final trip = result.getOrThrow();
       final notices = _generateNotices(trip);
 
-      emit(PlanningReady(
-        originLat: currentState.originLat,
-        originLng: currentState.originLng,
-        destinationLat: currentState.destinationLat,
-        destinationLng: currentState.destinationLng,
-        vehicle: currentState.vehicle,
-        assumptions: currentState.assumptions,
-        tripName: currentState.tripName,
-        trip: trip,
-        notices: notices,
-      ));
+      emit(
+        PlanningReady(
+          originLat: currentState.originLat,
+          originLng: currentState.originLng,
+          destinationLat: currentState.destinationLat,
+          destinationLng: currentState.destinationLng,
+          vehicle: currentState.vehicle,
+          assumptions: currentState.assumptions,
+          tripName: currentState.tripName,
+          trip: trip,
+          notices: notices,
+        ),
+      );
     } catch (e) {
-      emit(PlanningError('An unexpected error occurred: ${e.toString()}'));
+      emit(
+        PlanningError('An unexpected error occurred: ${e.toString()}'),
+      );
     }
   }
 
@@ -254,7 +323,8 @@ class PlanningBloc extends Bloc<PlanningEvent, PlanningState> {
     for (final leg in trip.legEstimates) {
       if (leg.arrivalSoCPercent < 10) {
         notices.add(
-            'Low battery warning: ${leg.arrivalSoCPercent.toStringAsFixed(1)}% at ${leg.leg.endLocation.latitude.toStringAsFixed(4)}, ${leg.leg.endLocation.longitude.toStringAsFixed(4)}');
+          'Low battery warning: ${leg.arrivalSoCPercent.toStringAsFixed(1)}% at ${leg.leg.endLocation.latitude.toStringAsFixed(4)}, ${leg.leg.endLocation.longitude.toStringAsFixed(4)}',
+        );
       }
     }
 
