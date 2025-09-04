@@ -1,11 +1,35 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/DI/dependency_injector.dart';
+import '../../../../data/datasources/remote/google_places_client.dart';
 import '../../../../domain/entities/vehicle.dart';
 import '../planning_bloc.dart';
 
 /// Widget for the trip planning form
-class PlanningFormWidget extends StatelessWidget {
+class PlanningFormWidget extends StatefulWidget {
   const PlanningFormWidget({super.key});
+
+  @override
+  State<PlanningFormWidget> createState() => _PlanningFormWidgetState();
+}
+
+class _PlanningFormWidgetState extends State<PlanningFormWidget> {
+  Timer? _originTimer;
+  Timer? _destinationTimer;
+  final _originController = TextEditingController();
+  final _destinationController = TextEditingController();
+  final _tripNameController = TextEditingController();
+
+  @override
+  void dispose() {
+    _originTimer?.cancel();
+    _destinationTimer?.cancel();
+    _originController.dispose();
+    _destinationController.dispose();
+    _tripNameController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,26 +40,28 @@ class PlanningFormWidget extends StatelessWidget {
         children: [
           // Origin input
           TextFormField(
+            controller: _originController,
             decoration: const InputDecoration(
               labelText: 'Origin',
               hintText: 'Enter origin address',
               prefixIcon: Icon(Icons.my_location),
             ),
             onChanged: (value) {
-              // TODO: Implement address search
+              _geocodeOrigin(value);
             },
           ),
           const SizedBox(height: 16),
 
           // Destination input
           TextFormField(
+            controller: _destinationController,
             decoration: const InputDecoration(
               labelText: 'Destination',
               hintText: 'Enter destination address',
               prefixIcon: Icon(Icons.location_on),
             ),
             onChanged: (value) {
-              // TODO: Implement address search
+              _geocodeDestination(value);
             },
           ),
           const SizedBox(height: 16),
@@ -64,13 +90,16 @@ class PlanningFormWidget extends StatelessWidget {
 
           // Trip name
           TextFormField(
+            controller: _tripNameController,
             decoration: const InputDecoration(
               labelText: 'Trip Name',
               hintText: 'Enter trip name',
               prefixIcon: Icon(Icons.label),
             ),
             onChanged: (value) {
-              // TODO: Update trip name
+              context
+                  .read<PlanningBloc>()
+                  .add(TripNameChanged(tripName: value));
             },
           ),
           const SizedBox(height: 24),
@@ -85,6 +114,54 @@ class PlanningFormWidget extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _geocodeOrigin(String address) {
+    _originTimer?.cancel();
+    if (address.trim().isEmpty) return;
+
+    _originTimer = Timer(const Duration(milliseconds: 800), () async {
+      try {
+        final placesClient = getIt<GooglePlacesClient>();
+        final coordinates = await placesClient.geocodeAddress(address);
+
+        if (coordinates != null && mounted) {
+          context.read<PlanningBloc>().add(
+                OriginChanged(
+                  latitude: coordinates.latitude,
+                  longitude: coordinates.longitude,
+                ),
+              );
+        }
+      } catch (e) {
+        // Handle geocoding error silently or show a subtle indicator
+        debugPrint('Failed to geocode origin: $e');
+      }
+    });
+  }
+
+  void _geocodeDestination(String address) {
+    _destinationTimer?.cancel();
+    if (address.trim().isEmpty) return;
+
+    _destinationTimer = Timer(const Duration(milliseconds: 800), () async {
+      try {
+        final placesClient = getIt<GooglePlacesClient>();
+        final coordinates = await placesClient.geocodeAddress(address);
+
+        if (coordinates != null && mounted) {
+          context.read<PlanningBloc>().add(
+                DestinationChanged(
+                  latitude: coordinates.latitude,
+                  longitude: coordinates.longitude,
+                ),
+              );
+        }
+      } catch (e) {
+        // Handle geocoding error silently or show a subtle indicator
+        debugPrint('Failed to geocode destination: $e');
+      }
+    });
   }
 
   List<Vehicle> _getVehicleOptions() {
