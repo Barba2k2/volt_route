@@ -72,6 +72,20 @@ class TripNameChanged extends PlanningEvent {
   List<Object?> get props => [tripName];
 }
 
+/// Event when current location is obtained from GPS
+class CurrentLocationObtained extends PlanningEvent {
+  final double latitude;
+  final double longitude;
+
+  const CurrentLocationObtained({
+    required this.latitude,
+    required this.longitude,
+  });
+
+  @override
+  List<Object?> get props => [latitude, longitude];
+}
+
 /// Event when trip planning is requested
 class PlanRequested extends PlanningEvent {
   final String? userId;
