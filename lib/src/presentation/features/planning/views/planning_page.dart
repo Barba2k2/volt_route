@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../planning_bloc.dart';
 import '../../../widgets/loading_widget.dart';
 import '../../../widgets/error_widget.dart';
-import '../widgets/planning_form_widget.dart';
+import '../widgets/interactive_planning_map_widget.dart';
 import '../widgets/trip_ready_widget.dart';
 
 /// Planning page for trip planning
@@ -44,7 +44,7 @@ class PlanningPage extends StatelessWidget {
             return TripReadyWidget(state: state);
           }
 
-          return const PlanningFormWidget();
+          return const InteractivePlanningMapWidget();
         },
       ),
     );
