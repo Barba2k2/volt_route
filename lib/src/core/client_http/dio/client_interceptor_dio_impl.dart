@@ -1,6 +1,7 @@
-import 'package:base_clean_arch_bloc/src/core/client_http/client_http.dart';
-import 'package:base_clean_arch_bloc/src/core/client_http/dio/dio_adapter.dart';
 import 'package:dio/dio.dart';
+
+import '../client_http.dart';
+import 'dio_adapter.dart';
 
 class ClientInterceptorDioImpl implements Interceptor {
   final IClientInterceptor interceptor;
@@ -20,7 +21,8 @@ class ClientInterceptorDioImpl implements Interceptor {
   }
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
     final restRequest = DioAdapter.toClientRequest(options);
     final message = await interceptor.onRequest(restRequest);
 
