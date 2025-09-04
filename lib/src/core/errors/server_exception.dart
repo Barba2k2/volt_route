@@ -1,10 +1,11 @@
-import 'package:base_clean_arch_bloc/src/core/errors/errors.dart';
+// ignore_for_file: overridden_fields
+
+import 'base_exception.dart';
 
 class ServerException extends BaseException {
   @override
   final String message;
   final String error;
-  @override
   final String? stackTrace;
 
   ServerException({
