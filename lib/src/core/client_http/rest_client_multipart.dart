@@ -1,13 +1,16 @@
-class RestClientMultipart {
-  final String fileKey;
-  final String fileName;
-  final String path;
-  final List<int>? fileBytes;
+import 'rest_client_http_message.dart';
 
-  RestClientMultipart({
-    required this.fileKey,
-    required this.fileName,
-    required this.path,
-    required this.fileBytes,
+/// Represents a multipart form data request
+class RestClientMultipart implements RestClientHttpMessage {
+  final String field;
+  final dynamic data;
+  final String? filename;
+  final String? contentType;
+
+  const RestClientMultipart({
+    required this.field,
+    required this.data,
+    this.filename,
+    this.contentType,
   });
 }
