@@ -1,4 +1,5 @@
-import 'package:base_clean_arch_bloc/src/core/client_http/client_http.dart';
+import 'rest_client_http_message.dart';
+import 'rest_client_request.dart';
 
 class RestClientResponse implements RestClientHttpMessage {
   dynamic data;
