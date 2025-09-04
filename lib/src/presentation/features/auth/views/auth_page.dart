@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../auth_bloc.dart';
 
@@ -35,7 +36,8 @@ class _AuthPageState extends State<AuthPage> {
       body: BlocListener<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is AuthAuthenticated) {
-            // TODO: Navigate to main app
+            // Navigate to main app
+            context.go('/planning');
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -143,16 +145,20 @@ class _AuthPageState extends State<AuthPage> {
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           if (_isSignUp) {
-                            context.read<AuthBloc>().add(SignUpRequested(
-                                  email: _emailController.text,
-                                  password: _passwordController.text,
-                                  name: _nameController.text,
-                                ));
+                            context.read<AuthBloc>().add(
+                                  SignUpRequested(
+                                    email: _emailController.text,
+                                    password: _passwordController.text,
+                                    name: _nameController.text,
+                                  ),
+                                );
                           } else {
-                            context.read<AuthBloc>().add(SignInRequested(
-                                  email: _emailController.text,
-                                  password: _passwordController.text,
-                                ));
+                            context.read<AuthBloc>().add(
+                                  SignInRequested(
+                                    email: _emailController.text,
+                                    password: _passwordController.text,
+                                  ),
+                                );
                           }
                         }
                       },
@@ -178,9 +184,9 @@ class _AuthPageState extends State<AuthPage> {
                     // Anonymous sign in
                     OutlinedButton(
                       onPressed: () {
-                        context
-                            .read<AuthBloc>()
-                            .add(const SignInAnonymouslyRequested());
+                        context.read<AuthBloc>().add(
+                              const SignInAnonymouslyRequested(),
+                            );
                       },
                       child: const Text('Continue as Guest'),
                     ),
